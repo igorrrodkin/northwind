@@ -16,21 +16,23 @@ class CustomersController extends Controller {
     this.router.get("/:customerID", this.getCustomerByID);
   };
   public getCustomers: RequestHandler = async (req, res) => {
-    const content = await this.customers.getContent();
+    const data = await this.customers.getContent();
     res.status(200).send({
-      content: content,
+      content: data.content,
+      logs: data.logs,
     });
   };
   public getCustomerByID: RequestHandler = async (req, res) => {
     const customerID = req.params.customerID;
-    const content = await this.customers.getContentByCustomerID(customerID);
-    if (!content) {
-      res.status(200).send({
+    const data = await this.customers.getContentByCustomerID(customerID);
+    if (!data.content) {
+      res.status(404).send({
         message: "No such customer",
       });
     } else {
       res.status(200).send({
-        content,
+        content: data.content,
+        logs: data.logs,
       });
     }
   };

@@ -5,11 +5,7 @@ import Controller from "./Controller.js";
 class SuppliesController extends Controller {
   public readonly path: string;
 
-  public constructor(
-    path: string,
-    public logger: object[],
-    public readonly supplies: Supplies
-  ) {
+  public constructor(path: string, public readonly supplies: Supplies) {
     super("");
     this.path = path;
     this.initializeRoutes();
@@ -20,25 +16,23 @@ class SuppliesController extends Controller {
     this.router.get("/:supplierID", this.getSuppliesBySupplierID);
   };
   public getSupplies: RequestHandler = async (req, res) => {
-    this.logger.push({ logs: "abc" });
-
-    const content = await this.supplies.getContent();
+    const dbResponse = await this.supplies.getContent();
     res.status(200).send({
-      content: content,
+      content: dbResponse.content,
+      logs: dbResponse.logs,
     });
   };
   public getSuppliesBySupplierID: RequestHandler = async (req, res) => {
-    this.logger.push({ logs: "def" });
-
     const supplierID = req.params.supplierID;
-    const content = await this.supplies.getContentBySupplierID(supplierID);
-    if (!content) {
+    const dbResponse = await this.supplies.getContentBySupplierID(supplierID);
+    if (!dbResponse.content) {
       res.status(200).send({
         message: "No such supplier",
       });
     } else {
       res.status(200).send({
-        content: content,
+        content: dbResponse.content,
+        logs: dbResponse.logs,
       });
     }
   };

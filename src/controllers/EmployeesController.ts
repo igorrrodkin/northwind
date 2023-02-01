@@ -17,8 +17,8 @@ class EmployeesController extends Controller {
     this.router.get("/:employeeID", this.getEmployeesByID);
   };
   public getEmployees: RequestHandler = async (req, res) => {
-    const content = await this.employees.getContent();
-    const mappedContent = content.map((item) => {
+    const data = await this.employees.getContent();
+    const mappedContent = data.content.map((item) => {
       const employeeFullName = `${item.firstName} ${item.lastName}`;
       return {
         name: employeeFullName,
@@ -31,33 +31,35 @@ class EmployeesController extends Controller {
 
     res.status(200).send({
       content: mappedContent,
+      logs: data.logs,
     });
   };
   public getEmployeesByID: RequestHandler = async (req, res) => {
     const employeeID = req.params.employeeID;
-    const content = await this.employees.getContentByEmployeeID(employeeID);
-    if (!content) {
+    const data = await this.employees.getContentByEmployeeID(employeeID);
+    if (!data.content) {
       res.status(200).send({
         message: "No such employee",
       });
     } else {
-      const employeeFullName = `${content.firstName} ${content.lastName}`;
-      const reportsTo = content.reportsTo;
+      const employeeFullName = `${data.content.firstName} ${data.content.lastName}`;
+      const reportsTo = data.content.reportsTo;
       const reportsContent = await this.employees.getFullNameByEmployeeID(
         reportsTo!
       );
       const fullNameReport = `${reportsContent.firstName} ${reportsContent.lastName}`;
-      const trueBirthDate = addYearsToDate(content.birthDate!, 32);
-      const trueHireDate = addYearsToDate(content.hireDate!, 32);
-      content.birthDate = trueBirthDate;
-      content.hireDate = trueHireDate;
+      const trueBirthDate = addYearsToDate(data.content.birthDate!, 32);
+      const trueHireDate = addYearsToDate(data.content.hireDate!, 32);
+      data.content.birthDate = trueBirthDate;
+      data.content.hireDate = trueHireDate;
 
       res.status(200).send({
         content: {
           name: employeeFullName,
-          ...content,
+          ...data.content,
           reportsToName: fullNameReport,
         },
+        logs: data.logs,
       });
     }
   };

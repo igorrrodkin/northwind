@@ -3,12 +3,10 @@ import Controller from "./Controller.js";
 
 class DashboardController extends Controller {
   public readonly path: string;
-  //   public readonly logs: object[];
 
-  public constructor(path: string, public logs: object[]) {
+  public constructor(path: string) {
     super("");
     this.path = path;
-    this.logs = logs;
     this.initializeRoutes();
   }
 
@@ -17,7 +15,7 @@ class DashboardController extends Controller {
   };
   public getLogs: RequestHandler = async (req, res) => {
     res.status(200).send({
-      content: this.logs,
+      content: "logs from local session should be here",
     });
   };
 }

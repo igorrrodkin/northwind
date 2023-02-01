@@ -6,6 +6,7 @@ class Employees {
   public constructor(public db: NodePgDatabase) {}
 
   public getContent = async () => {
+    const date1 = Date.now();
     const content = await this.db.select(employees).fields({
       firstName: employees.firstName,
       lastName: employees.lastName,
@@ -14,10 +15,31 @@ class Employees {
       phone: employees.homePhone,
       country: employees.country,
     });
-    return content;
+    const date2 = Date.now();
+
+    const logs = this.db
+      .select(employees)
+      .fields({
+        firstName: employees.firstName,
+        lastName: employees.lastName,
+        title: employees.title,
+        city: employees.city,
+        phone: employees.homePhone,
+        country: employees.country,
+      })
+      .toSQL();
+    return {
+      content,
+      logs: {
+        sql: logs.sql.split('"').join(""),
+        date: new Date(),
+        requestTime: date2 - date1 + "ms",
+      },
+    };
   };
 
   public getContentByEmployeeID = async (employeeID: string) => {
+    const date1 = Date.now();
     const content = await this.db
       .select(employees)
       .fields({
@@ -37,7 +59,36 @@ class Employees {
         reportsTo: employees.reportsTo,
       })
       .where(eq(employees.employeeID, employeeID));
-    return content[0];
+    const date2 = Date.now();
+    const logs = this.db
+      .select(employees)
+      .fields({
+        firstName: employees.firstName,
+        lastName: employees.lastName,
+        title: employees.title,
+        titleOfCourtesy: employees.titleOfCourtesy,
+        birthDate: employees.birthDate,
+        hireDate: employees.hireDate,
+        address: employees.address,
+        city: employees.city,
+        postalCode: employees.postalCode,
+        country: employees.country,
+        homePhone: employees.homePhone,
+        extension: employees.extension,
+        notes: employees.notes,
+        reportsTo: employees.reportsTo,
+      })
+      .where(eq(employees.employeeID, employeeID))
+      .toSQL();
+
+    return {
+      content: content[0],
+      logs: {
+        sql: logs.sql.split('"').join(""),
+        date: new Date(),
+        requestTime: date2 - date1 + "ms",
+      },
+    };
   };
 
   public getFullNameByEmployeeID = async (employeeID: string) => {

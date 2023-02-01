@@ -14,14 +14,18 @@ class OrdersController extends Controller {
 
   public initializeRoutes = () => {
     this.router.get("/", this.getOrders);
+
     this.router.get("/:orderID", this.getOrdersByOrderID);
   };
+
   public getOrders: RequestHandler = async (req, res) => {
-    const fullData = await this.orders.getFullContent();
-    const orderIDs = fullData.map((item) => item.id);
+    const dbResponse = await this.orders.getFullContent();
+    const orderIDs = dbResponse.content.map((item) => item.orderID);
     const orderIDsUnique = Array.from(new Set(orderIDs));
     const mappedContent = orderIDsUnique.map((id) => {
-      const filteredByID = fullData.filter((element) => element.id == id);
+      const filteredByID = dbResponse.content.filter(
+        (element) => element.orderID == id
+      );
       const products = filteredByID.length;
       const quantity = filteredByID.reduce((acc, obj) => {
         return acc + parseInt(obj.quantity!);
@@ -29,7 +33,7 @@ class OrdersController extends Controller {
       const price = filteredByID.reduce((acc, obj) => {
         return acc + parseInt(obj.quantity!) * parseFloat(obj.unitPrice!);
       }, 0);
-      const dataByID = fullData.find((item) => item.id == id);
+      const dataByID = dbResponse.content.find((item) => item.orderID == id);
 
       const validShippedDate = validDateByConvertingToDate(
         dataByID!.shipped!,
@@ -48,24 +52,26 @@ class OrdersController extends Controller {
     });
     res.status(200).send({
       content: mappedContent,
+      logs: dbResponse.logs,
     });
   };
+
   public getOrdersByOrderID: RequestHandler = async (req, res) => {
     const orderID = req.params.orderID;
-    const fullContent = await this.orders.getFullContentByOrderID(orderID);
-    if (!fullContent.length) {
+    const dbResponse = await this.orders.getFullContentByOrderID(orderID);
+    if (!dbResponse.content.length) {
       res.status(200).send({
         message: "No such order",
       });
     } else {
-      const totalProducts = fullContent.length;
-      const totalQuantity = fullContent.reduce((acc, obj) => {
+      const totalProducts = dbResponse.content.length;
+      const totalQuantity = dbResponse.content.reduce((acc, obj) => {
         return acc + parseInt(obj.quantity!);
       }, 0);
-      const totalPrice = fullContent.reduce((acc, obj) => {
+      const totalPrice = dbResponse.content.reduce((acc, obj) => {
         return acc + parseInt(obj.quantity!) * parseFloat(obj.unitPrice!);
       }, 0);
-      const totalDiscount = fullContent.reduce((acc, obj) => {
+      const totalDiscount = dbResponse.content.reduce((acc, obj) => {
         return (
           acc +
           parseInt(obj.quantity!) *
@@ -75,19 +81,19 @@ class OrdersController extends Controller {
       }, 0);
 
       const validShippedDate = validDateByConvertingToDate(
-        fullContent[0].shippedDate!,
+        dbResponse.content[0].shippedDate!,
         16
       );
       const validRequiredDate = validDateByConvertingToDate(
-        fullContent[0].requiredDate!,
+        dbResponse.content[0].requiredDate!,
         16
       );
       const validOrderDate = validDateByConvertingToDate(
-        fullContent[0].orderDate!,
+        dbResponse.content[0].orderDate!,
         16
       );
 
-      const productsInOrderMapped = fullContent.map((item) => {
+      const productsInOrderMapped = dbResponse.content.map((item) => {
         return {
           product: item.productName,
           quantity: +item.quantity!,
@@ -100,23 +106,24 @@ class OrdersController extends Controller {
 
       res.status(200).send({
         content: {
-          customerID: fullContent[0].customerID,
-          shipName: fullContent[0].shipName,
+          customerID: dbResponse.content[0].customerID,
+          shipName: dbResponse.content[0].shipName,
           totalProducts,
           totalQuantity,
           totalPrice: totalPrice + "$",
           totalDiscount: totalDiscount.toFixed(2) + "$",
-          shipVia: fullContent[0].shipVia,
-          freight: fullContent[0].freight,
+          shipVia: dbResponse.content[0].shipVia,
+          freight: dbResponse.content[0].freight,
           orderDate: validOrderDate,
           requiredDate: validRequiredDate,
           shippedDate: validShippedDate,
-          shipCity: fullContent[0].shipCity,
-          region: fullContent[0].region,
-          shipPostalCode: fullContent[0].shipPostalCode,
-          shipCountry: fullContent[0].shipCountry,
+          shipCity: dbResponse.content[0].shipCity,
+          region: dbResponse.content[0].region,
+          shipPostalCode: dbResponse.content[0].shipPostalCode,
+          shipCountry: dbResponse.content[0].shipCountry,
           productsInOrder: productsInOrderMapped,
         },
+        logs: dbResponse.logs,
       });
     }
   };

@@ -16,33 +16,14 @@ import CustomersController from "./controllers/CustomersController.js";
 import Customers from "./db/customers/Customers.js";
 import SearchController from "./controllers/SearchController.js";
 import DashboardController from "./controllers/DashboardController.js";
-// import winston from "winston";
 
 const main = async () => {
-  //   const migrationsClient: any = postgres(
-  //     "postgres://postgres:123456789@psql-db.cbdczouan2lk.us-east-1.rds.amazonaws.com:5432/postgres",
-  //     {
-  //       max: 1,
-  //     }
-  //   );
   const client: NodePgDatabase = drizzle(pool);
 
-  //   await migrate(client, { migrationsFolder: "./migrations" });
-
-  //   const logger = winston.createLogger({
-  //     // format: winston.format.json(),
-  //     transports: [
-  //       new winston.transports.File({
-  //         filename: "logs.log",
-  //       }),
-  //     ],
-  //   });
-  const logs: object[] = [];
   const controllers = [
-    new SuppliesController("/suppliers", logs, new Supplies(client)),
+    new SuppliesController("/suppliers", new Supplies(client)),
     new ProductsController(
       "/products",
-      logs,
       new Products(client),
       new Supplies(client)
     ),
@@ -54,7 +35,7 @@ const main = async () => {
       new Customers(client),
       new Products(client)
     ),
-    new DashboardController("/dash", logs),
+    new DashboardController("/dash"),
   ];
   const port = process.env.PORT_APP || 5000;
 

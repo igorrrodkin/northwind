@@ -9,7 +9,6 @@ class ProductsController extends Controller {
 
   public constructor(
     path: string,
-    public logger: object[],
     public readonly products: Products,
     public readonly supplies: Supplies
   ) {
@@ -23,29 +22,24 @@ class ProductsController extends Controller {
     this.router.get("/:productID", this.getProductsByProductID);
   };
   public getProducts: RequestHandler = async (req, res) => {
-    // this.logger.log("info", "get products");
-    this.logger.push({ message: "products" });
-    const content = await this.products.getContent();
+    const dbResponse = await this.products.getContent();
     res.status(200).send({
-      content: content,
+      content: dbResponse.content,
+      logs: dbResponse.logs,
     });
   };
-  public getProductsByProductID: RequestHandler = async (req, res) => {
-    // this.logger.log("info", "get products by ID");
-    this.logger.push({ message: "products by ID" });
 
+  public getProductsByProductID: RequestHandler = async (req, res) => {
     const productID = req.params.productID;
-    const content = await this.products.getContentByProductID(productID);
-    if (!content) {
+    const dbResponse = await this.products.getContentByProductID(productID);
+    if (!dbResponse.content) {
       res.status(200).send({
         message: "No such product",
       });
     } else {
-      const suplierId = content.supplierID;
-      const supplier = await this.supplies.getCompanyNameByID(suplierId!);
-      const contentWithSpplierName = { ...content, supplier };
       res.status(200).send({
-        content: contentWithSpplierName,
+        content: dbResponse.content,
+        logs: dbResponse.logs,
       });
     }
   };

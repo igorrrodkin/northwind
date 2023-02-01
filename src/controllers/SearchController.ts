@@ -24,8 +24,8 @@ class SearchController extends Controller {
     const searchInput = req.params.searchInput;
     const tableForSearch: "products" | "customers" = req.body.tableForSearch;
     if (tableForSearch == "products") {
-      const content = await this.products.getContent();
-      const filteredContent = content.filter((item) =>
+      const dbResponse = await this.products.getContent();
+      const filteredContent = dbResponse.content.filter((item) =>
         item.name?.toLowerCase().includes(searchInput.toLowerCase())
       );
       if (!filteredContent.length) {
@@ -35,11 +35,12 @@ class SearchController extends Controller {
       } else {
         res.status(200).send({
           content: filteredContent,
+          logs: dbResponse.logs,
         });
       }
     } else if (tableForSearch == "customers") {
-      const content = await this.customers.getContent();
-      const filteredContent = content.filter(
+      const dbResponse = await this.customers.getContent();
+      const filteredContent = dbResponse.content.filter(
         (item) =>
           item.companyName?.toLowerCase().includes(searchInput.toLowerCase()) ||
           item.contactName?.toLowerCase().includes(searchInput.toLowerCase()) ||
@@ -55,10 +56,10 @@ class SearchController extends Controller {
       } else {
         res.status(200).send({
           content: filteredContent,
+          logs: dbResponse.logs,
         });
       }
     }
   };
 }
-
 export default SearchController;
