@@ -11,10 +11,11 @@ class App {
     this.controllers = controllers;
     this.initializeMiddlewares();
     this.initializeControllers();
+    this.handleInvalidRoutesMiddleware();
   }
   public listen = () => {
     this.app.listen(this.port, () => {
-      console.log(`App is listening on the port ${this.port}`);
+      console.log(`App is now listening on the port ${this.port}`);
     });
   };
   private initializeMiddlewares = () => {
@@ -32,6 +33,13 @@ class App {
   private initializeControllers = () => {
     this.controllers.forEach((controller) => {
       this.app.use(controller.path, controller.router);
+    });
+  };
+  private handleInvalidRoutesMiddleware = () => {
+    this.app.use("*", (req, res) => {
+      res.status(404).send({
+        message: "Endpoint is not supported",
+      });
     });
   };
 }
