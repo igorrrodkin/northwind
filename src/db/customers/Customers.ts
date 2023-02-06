@@ -15,6 +15,7 @@ class Customers {
       city: customers.city,
       country: customers.country,
       address: customers.address,
+      phone: customers.phone,
     });
     const date2 = Date.now();
 
@@ -28,6 +29,7 @@ class Customers {
         city: customers.city,
         country: customers.country,
         address: customers.address,
+        phone: customers.phone,
       })
       .toSQL();
     return {
