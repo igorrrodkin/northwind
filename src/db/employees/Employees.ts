@@ -8,6 +8,7 @@ class Employees {
   public getContent = async () => {
     const date1 = Date.now();
     const content = await this.db.select(employees).fields({
+      id: employees.employeeID,
       firstName: employees.firstName,
       lastName: employees.lastName,
       title: employees.title,

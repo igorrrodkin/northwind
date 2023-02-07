@@ -10,7 +10,7 @@ class Products {
     const date1 = Date.now();
 
     const content = await this.db.select(products).fields({
-      product: products.productID,
+      id: products.productID,
       name: products.productName,
       qtPerUnit: products.quantityPerUnit,
       price: products.unitPrice,
@@ -21,7 +21,7 @@ class Products {
     const logs = this.db
       .select(products)
       .fields({
-        product: products.productID,
+        id: products.productID,
         name: products.productName,
         qtPerUnit: products.quantityPerUnit,
         price: products.unitPrice,
