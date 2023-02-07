@@ -27,7 +27,7 @@ class CustomersController extends Controller {
     const data = await this.customers.getContentByCustomerID(customerID);
     if (!data.content) {
       res.status(404).send({
-        message: "No such customer",
+        content: [],
       });
     } else {
       res.status(200).send({

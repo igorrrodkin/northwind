@@ -30,7 +30,7 @@ class SearchController extends Controller {
       );
       if (!filteredContent.length) {
         res.status(200).send({
-          message: "No results",
+          content: [],
         });
       } else {
         res.status(200).send({
@@ -51,7 +51,7 @@ class SearchController extends Controller {
       );
       if (!filteredContent.length) {
         res.status(200).send({
-          message: "No results",
+          content: [],
         });
       } else {
         res.status(200).send({

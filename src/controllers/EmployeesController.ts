@@ -40,7 +40,7 @@ class EmployeesController extends Controller {
     const data = await this.employees.getContentByEmployeeID(employeeID);
     if (!data.content) {
       res.status(200).send({
-        message: "No such employee",
+        content: [],
       });
     } else {
       const employeeFullName = `${data.content.firstName} ${data.content.lastName}`;

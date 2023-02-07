@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-// import winston, { loggers } from "winston";
 import Products from "../db/products/Products.js";
 import Supplies from "../db/supplies/Supplies.js";
 import Controller from "./Controller.js";
@@ -34,7 +33,7 @@ class ProductsController extends Controller {
     const dbResponse = await this.products.getContentByProductID(productID);
     if (!dbResponse.content) {
       res.status(200).send({
-        message: "No such product",
+        content: [],
       });
     } else {
       res.status(200).send({

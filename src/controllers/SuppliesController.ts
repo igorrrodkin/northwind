@@ -27,7 +27,7 @@ class SuppliesController extends Controller {
     const dbResponse = await this.supplies.getContentBySupplierID(supplierID);
     if (!dbResponse.content) {
       res.status(200).send({
-        message: "No such supplier",
+        content: [],
       });
     } else {
       res.status(200).send({

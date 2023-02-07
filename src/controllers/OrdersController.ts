@@ -61,7 +61,7 @@ class OrdersController extends Controller {
     const dbResponse = await this.orders.getFullContentByOrderID(orderID);
     if (!dbResponse.content.length) {
       res.status(200).send({
-        message: "No such order",
+        content: [],
       });
     } else {
       const totalProducts = dbResponse.content.length;
