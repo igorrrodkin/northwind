@@ -21,6 +21,7 @@ class EmployeesController extends Controller {
     const mappedContent = data.content.map((item) => {
       const employeeFullName = `${item.firstName} ${item.lastName}`;
       return {
+        id: item.id,
         name: employeeFullName,
         title: item.title,
         city: item.city,
