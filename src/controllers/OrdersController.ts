@@ -105,24 +105,26 @@ class OrdersController extends Controller {
       });
 
       res.status(200).send({
-        content: {
-          customerID: dbResponse.content[0].customerID,
-          shipName: dbResponse.content[0].shipName,
-          totalProducts,
-          totalQuantity,
-          totalPrice: totalPrice + "$",
-          totalDiscount: totalDiscount.toFixed(2) + "$",
-          shipVia: dbResponse.content[0].shipVia,
-          freight: dbResponse.content[0].freight,
-          orderDate: validOrderDate,
-          requiredDate: validRequiredDate,
-          shippedDate: validShippedDate,
-          shipCity: dbResponse.content[0].shipCity,
-          region: dbResponse.content[0].region,
-          shipPostalCode: dbResponse.content[0].shipPostalCode,
-          shipCountry: dbResponse.content[0].shipCountry,
-          productsInOrder: productsInOrderMapped,
-        },
+        content: [
+          {
+            customerID: dbResponse.content[0].customerID,
+            shipName: dbResponse.content[0].shipName,
+            totalProducts,
+            totalQuantity,
+            totalPrice: totalPrice + "$",
+            totalDiscount: totalDiscount.toFixed(2) + "$",
+            shipVia: dbResponse.content[0].shipVia,
+            freight: dbResponse.content[0].freight,
+            orderDate: validOrderDate,
+            requiredDate: validRequiredDate,
+            shippedDate: validShippedDate,
+            shipCity: dbResponse.content[0].shipCity,
+            region: dbResponse.content[0].region,
+            shipPostalCode: dbResponse.content[0].shipPostalCode,
+            shipCountry: dbResponse.content[0].shipCountry,
+            productsInOrder: productsInOrderMapped,
+          },
+        ],
         logs: dbResponse.logs,
       });
     }

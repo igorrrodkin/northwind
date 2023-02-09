@@ -37,7 +37,7 @@ class ProductsController extends Controller {
       });
     } else {
       res.status(200).send({
-        content: dbResponse.content,
+        content: [dbResponse.content],
         logs: dbResponse.logs,
       });
     }

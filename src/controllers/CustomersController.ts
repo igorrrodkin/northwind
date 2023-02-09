@@ -31,7 +31,7 @@ class CustomersController extends Controller {
       });
     } else {
       res.status(200).send({
-        content: data.content,
+        content: [data.content],
         logs: data.logs,
       });
     }

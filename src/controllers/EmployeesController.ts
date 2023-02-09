@@ -55,11 +55,13 @@ class EmployeesController extends Controller {
       data.content.hireDate = trueHireDate;
 
       res.status(200).send({
-        content: {
-          name: employeeFullName,
-          ...data.content,
-          reportsToName: fullNameReport,
-        },
+        content: [
+          {
+            name: employeeFullName,
+            ...data.content,
+            reportsToName: fullNameReport,
+          },
+        ],
         logs: data.logs,
       });
     }
