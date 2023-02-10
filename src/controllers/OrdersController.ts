@@ -95,11 +95,12 @@ class OrdersController extends Controller {
 
       const productsInOrderMapped = dbResponse.content.map((item) => {
         return {
+          id: item.productID,
           product: item.productName,
           quantity: +item.quantity!,
-          orderPrice: item.unitPrice + "$",
+          orderPrice: "$" + item.unitPrice,
           totalPrice:
-            (+item.quantity! * parseFloat(item.unitPrice!)).toFixed(2) + "$",
+            "$" + (+item.quantity! * parseFloat(item.unitPrice!)).toFixed(2),
           discount: parseFloat(item.discount!) * 100 + "%",
         };
       });
@@ -111,10 +112,10 @@ class OrdersController extends Controller {
             shipName: dbResponse.content[0].shipName,
             totalProducts,
             totalQuantity,
-            totalPrice: totalPrice + "$",
-            totalDiscount: totalDiscount.toFixed(2) + "$",
+            totalPrice: "$" + totalPrice,
+            totalDiscount: "$" + totalDiscount.toFixed(2),
             shipVia: dbResponse.content[0].shipVia,
-            freight: dbResponse.content[0].freight,
+            freight: "$" + dbResponse.content[0].freight,
             orderDate: validOrderDate,
             requiredDate: validRequiredDate,
             shippedDate: validShippedDate,
