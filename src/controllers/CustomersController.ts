@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import Customers from "../db/customers/Customers.js";
+import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
 
 class CustomersController extends Controller {
@@ -19,7 +20,11 @@ class CustomersController extends Controller {
     const data = await this.customers.getContent();
     res.status(200).send({
       content: data.content,
-      logs: data.logs,
+      logs: {
+        sql: sqlSyntaxUpperCase(data.logs.sql),
+        date: data.logs.date,
+        requestTime: data.logs.requestTime,
+      },
     });
   };
   public getCustomerByID: RequestHandler = async (req, res) => {
@@ -32,7 +37,11 @@ class CustomersController extends Controller {
     } else {
       res.status(200).send({
         content: [data.content],
-        logs: data.logs,
+        logs: {
+          sql: sqlSyntaxUpperCase(data.logs.sql),
+          date: data.logs.date,
+          requestTime: data.logs.requestTime,
+        },
       });
     }
   };

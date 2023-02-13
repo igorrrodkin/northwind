@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import Employees from "../db/employees/Employees.js";
 import { addYearsToDate } from "../utils/dateHandler.js";
+import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
 
 class EmployeesController extends Controller {
@@ -32,7 +33,11 @@ class EmployeesController extends Controller {
 
     res.status(200).send({
       content: mappedContent,
-      logs: data.logs,
+      logs: {
+        sql: sqlSyntaxUpperCase(data.logs.sql),
+        date: data.logs.date,
+        requestTime: data.logs.requestTime,
+      },
     });
   };
   public getEmployeesByID: RequestHandler = async (req, res) => {
@@ -62,7 +67,11 @@ class EmployeesController extends Controller {
             reportsToName: fullNameReport,
           },
         ],
-        logs: data.logs,
+        logs: {
+          sql: sqlSyntaxUpperCase(data.logs.sql),
+          date: data.logs.date,
+          requestTime: data.logs.requestTime,
+        },
       });
     }
   };

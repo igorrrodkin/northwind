@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import Customers from "../db/customers/Customers.js";
 import Products from "../db/products/Products.js";
+import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
 
 class SearchController extends Controller {
@@ -35,7 +36,11 @@ class SearchController extends Controller {
       } else {
         res.status(200).send({
           content: filteredContent,
-          logs: dbResponse.logs,
+          logs: {
+            sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+            date: dbResponse.logs.date,
+            requestTime: dbResponse.logs.requestTime,
+          },
         });
       }
     } else if (tableForSearch == "customers") {
@@ -56,7 +61,11 @@ class SearchController extends Controller {
       } else {
         res.status(200).send({
           content: filteredContent,
-          logs: dbResponse.logs,
+          logs: {
+            sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+            date: dbResponse.logs.date,
+            requestTime: dbResponse.logs.requestTime,
+          },
         });
       }
     }

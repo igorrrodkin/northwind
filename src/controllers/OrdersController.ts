@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import Orders from "../db/orders/Orders.js";
 import { validDateByConvertingToDate } from "../utils/dateHandler.js";
+import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
 
 class OrdersController extends Controller {
@@ -52,7 +53,11 @@ class OrdersController extends Controller {
     });
     res.status(200).send({
       content: mappedContent,
-      logs: dbResponse.logs,
+      logs: {
+        sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+        date: dbResponse.logs.date,
+        requestTime: dbResponse.logs.requestTime,
+      },
     });
   };
 
@@ -126,7 +131,11 @@ class OrdersController extends Controller {
             productsInOrder: productsInOrderMapped,
           },
         ],
-        logs: dbResponse.logs,
+        logs: {
+          sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+          date: dbResponse.logs.date,
+          requestTime: dbResponse.logs.requestTime,
+        },
       });
     }
   };

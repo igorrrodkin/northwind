@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import Supplies from "../db/supplies/Supplies.js";
+import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
 
 class SuppliesController extends Controller {
@@ -19,7 +20,11 @@ class SuppliesController extends Controller {
     const dbResponse = await this.supplies.getContent();
     res.status(200).send({
       content: dbResponse.content,
-      logs: dbResponse.logs,
+      logs: {
+        sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+        date: dbResponse.logs.date,
+        requestTime: dbResponse.logs.requestTime,
+      },
     });
   };
   public getSuppliesBySupplierID: RequestHandler = async (req, res) => {
@@ -32,7 +37,11 @@ class SuppliesController extends Controller {
     } else {
       res.status(200).send({
         content: [dbResponse.content],
-        logs: dbResponse.logs,
+        logs: {
+          sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+          date: dbResponse.logs.date,
+          requestTime: dbResponse.logs.requestTime,
+        },
       });
     }
   };
