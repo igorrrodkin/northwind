@@ -19,7 +19,10 @@ class OrdersController extends Controller {
   };
 
   public getOrdersPerPage: RequestHandler = async (req, res) => {
-    const page = req.query.page;
+    let page = req.query.page;
+    if (!page) {
+      page = "1";
+    }
     const dbResponse = await this.orders.getFullContentPerPage(+page!);
     const orderIDs = dbResponse.content.map((item) => item.orderID);
     const orderIDsUnique = Array.from(new Set(orderIDs));
