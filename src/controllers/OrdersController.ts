@@ -52,6 +52,7 @@ class OrdersController extends Controller {
       };
     });
     res.status(200).send({
+      pages: dbResponse.pages,
       content: mappedContent,
       logs: {
         sql: sqlSyntaxUpperCase(dbResponse.logs.sql),

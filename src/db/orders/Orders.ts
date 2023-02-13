@@ -42,6 +42,9 @@ class Orders {
     };
   };
   public getFullContentPerPage = async (page: number) => {
+    const fullContent = await this.db.select(orders);
+    const length = fullContent.length;
+    const pages = Math.floor(length / 20) + 1;
     const date1 = Date.now();
     const firstPaginationItem = `${10248 + (page - 1) * 20}`;
     const lastPaginationItem = `${10248 + (page - 1) * 20 + 19}`;
@@ -76,6 +79,7 @@ class Orders {
       .offset(page * 20 + 1)
       .toSQL();
     return {
+      pages,
       content,
       logs: {
         sql: logs.sql.split('"').join(""),
