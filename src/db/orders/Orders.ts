@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm/expressions.js";
+import { and, eq, gte, lte } from "drizzle-orm/expressions.js";
 import { orders } from "./ordersSchema.js";
 import { NodePgDatabase } from "drizzle-orm-pg/node/index.js";
 import { orderDetails } from "./orderDetailsSchema.js";
@@ -31,6 +31,49 @@ class Orders {
         ...orderDetails,
       })
       .leftJoin(orderDetails, eq(orders.orderID, orderDetails.orderID))
+      .toSQL();
+    return {
+      content,
+      logs: {
+        sql: logs.sql.split('"').join(""),
+        date: new Date(),
+        requestTime: date2 - date1 + "ms",
+      },
+    };
+  };
+  public getFullContentPerPage = async (page: number) => {
+    const date1 = Date.now();
+    const firstPaginationItem = `${10248 + (page - 1) * 20}`;
+    const lastPaginationItem = `${10248 + (page - 1) * 20 + 19}`;
+    const content = await this.db
+      .select(orders)
+      .fields({
+        shipped: orders.shippedDate,
+        shipName: orders.shipName,
+        city: orders.shipCity,
+        country: orders.shipCountry,
+        ...orderDetails,
+      })
+      .leftJoin(orderDetails, eq(orders.orderID, orderDetails.orderID))
+      .where(
+        and(
+          lte(orders.orderID, lastPaginationItem),
+          gte(orders.orderID, firstPaginationItem)
+        )
+      );
+    const date2 = Date.now();
+    const logs = this.db
+      .select(orders)
+      .fields({
+        shipped: orders.shippedDate,
+        shipName: orders.shipName,
+        city: orders.shipCity,
+        country: orders.shipCountry,
+        ...orderDetails,
+      })
+      .leftJoin(orderDetails, eq(orders.orderID, orderDetails.orderID))
+      .limit(20)
+      .offset(page * 20 + 1)
       .toSQL();
     return {
       content,

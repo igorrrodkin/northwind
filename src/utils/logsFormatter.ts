@@ -8,7 +8,9 @@ export const sqlSyntaxUpperCase = (logs: string) => {
         item == "left" ||
         item == "join" ||
         item == "on" ||
-        item == "where"
+        item == "where" ||
+        item == "limit" ||
+        item == "offset"
       ) {
         item = item.toUpperCase();
       }

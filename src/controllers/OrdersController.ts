@@ -14,13 +14,13 @@ class OrdersController extends Controller {
   }
 
   public initializeRoutes = () => {
-    this.router.get("/", this.getOrders);
-
+    this.router.get("/", this.getOrdersPerPage);
     this.router.get("/:orderID", this.getOrdersByOrderID);
   };
 
-  public getOrders: RequestHandler = async (req, res) => {
-    const dbResponse = await this.orders.getFullContent();
+  public getOrdersPerPage: RequestHandler = async (req, res) => {
+    const page = req.query.page;
+    const dbResponse = await this.orders.getFullContentPerPage(+page!);
     const orderIDs = dbResponse.content.map((item) => item.orderID);
     const orderIDsUnique = Array.from(new Set(orderIDs));
     const mappedContent = orderIDsUnique.map((id) => {
