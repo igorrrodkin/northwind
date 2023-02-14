@@ -3,10 +3,10 @@ import { text, numeric, pgSchema } from "drizzle-orm-pg";
 const schemaNorthwind = pgSchema("northwind");
 
 export const customers = schemaNorthwind("customers", {
-  customerID: numeric("CustomerID"),
-  companyName: text("CompanyName"),
-  contactName: text("ContactName"),
-  contactTitle: text("ContactTitle"),
+  customerID: numeric("CustomerID").notNull(),
+  companyName: text("CompanyName").notNull(),
+  contactName: text("ContactName").notNull(),
+  contactTitle: text("ContactTitle").notNull(),
   address: text("Address"),
   city: text("City"),
   region: text("Region"),
