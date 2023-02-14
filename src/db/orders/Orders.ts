@@ -4,6 +4,7 @@ import { NodePgDatabase } from "drizzle-orm-pg/node/index.js";
 import { orderDetails } from "./orderDetailsSchema.js";
 import { products } from "../products/schema.js";
 import { shippers } from "./shippersSchema.js";
+import { sql } from "drizzle-orm";
 
 class Orders {
   public constructor(public db: NodePgDatabase) {}
@@ -42,9 +43,9 @@ class Orders {
     };
   };
   public getFullContentPerPage = async (page: number) => {
-    const fullContent = await this.db.select(orders);
-    const length = fullContent.length;
-    const pages = Math.floor(length / 20) + 1;
+    // const fullContent = await this.db.select(orders);
+    // const length = fullContent.length;
+    // const pages = Math.floor(length / 20) + 1;
     const date1 = Date.now();
     const firstPaginationItem = `${10248 + (page - 1) * 20}`;
     const lastPaginationItem = `${10248 + (page - 1) * 20 + 19}`;
@@ -83,7 +84,7 @@ class Orders {
       )
       .toSQL();
     return {
-      pages,
+      // pages,
       content,
       logs: {
         sql: logs.sql.split('"').join(""),
@@ -147,6 +148,22 @@ class Orders {
         sql: logs.sql.split('"').join(""),
         date: new Date(),
         requestTime: date2 - date1 + "ms",
+      },
+    };
+  };
+
+  public getRowsQuantity = async () => {
+    const date1 = Date.now();
+    const response = await this.db.execute(
+      sql`SELECT count(1) AS total FROM northwind.orders`
+    );
+    const date2 = Date.now();
+    return {
+      rows: response.rows[0].total,
+      logs: {
+        sql: `SELECT count(1) AS total FROM northwind.orders`,
+        requestTime: date2 - date1 + "ms",
+        date: new Date(),
       },
     };
   };

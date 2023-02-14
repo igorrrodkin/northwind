@@ -1,21 +1,26 @@
 import { eq } from "drizzle-orm/expressions.js";
 import { supplies } from "./schema.js";
 import { NodePgDatabase } from "drizzle-orm-pg/node/index.js";
+import { sql } from "drizzle-orm";
 
 class Supplies {
   public constructor(public db: NodePgDatabase) {}
 
-  public getContent = async () => {
+  public getContentPerPage = async (page: number) => {
     const date1 = Date.now();
 
-    const content = await this.db.select(supplies).fields({
-      id: supplies.supplierID,
-      company: supplies.companyName,
-      contact: supplies.contactName,
-      title: supplies.contactTitle,
-      city: supplies.city,
-      country: supplies.country,
-    });
+    const content = await this.db
+      .select(supplies)
+      .fields({
+        id: supplies.supplierID,
+        company: supplies.companyName,
+        contact: supplies.contactName,
+        title: supplies.contactTitle,
+        city: supplies.city,
+        country: supplies.country,
+      })
+      .limit(20)
+      .offset((page - 1) * 20);
     const date2 = Date.now();
     const logs = this.db
       .select(supplies)
@@ -27,6 +32,8 @@ class Supplies {
         city: supplies.city,
         country: supplies.country,
       })
+      .limit(20)
+      .offset((page - 1) * 20)
       .toSQL();
     return {
       content,
@@ -59,15 +66,21 @@ class Supplies {
     };
   };
 
-  //   public getCompanyNameByID = async (supplierID: string) => {
-  //     const content = await this.db
-  //       .select(supplies)
-  //       .fields({
-  //         companyName: supplies.companyName,
-  //       })
-  //       .where(eq(supplies.supplierID, supplierID));
-  //     return content[0].companyName;
-  //   };
+  public getRowsQuantity = async () => {
+    const date1 = Date.now();
+    const response = await this.db.execute(
+      sql`SELECT count(1) AS total FROM northwind.supplies`
+    );
+    const date2 = Date.now();
+    return {
+      rows: response.rows[0].total,
+      logs: {
+        sql: `SELECT count(1) AS total FROM northwind.supplies`,
+        requestTime: date2 - date1 + "ms",
+        date: new Date(),
+      },
+    };
+  };
 }
 
 export default Supplies;

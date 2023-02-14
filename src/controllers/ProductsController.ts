@@ -22,15 +22,35 @@ class ProductsController extends Controller {
     this.router.get("/:productID", this.getProductsByProductID);
   };
   public getProducts: RequestHandler = async (req, res) => {
-    const dbResponse = await this.products.getContent();
-    res.status(200).send({
-      content: dbResponse.content,
-      logs: {
-        sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
-        date: dbResponse.logs.date,
-        requestTime: dbResponse.logs.requestTime,
-      },
-    });
+    const rowsResponse = await this.products.getRowsQuantity();
+    const pagesQuantity = Math.floor((rowsResponse.rows as number) / 20 + 1);
+    let page = req.query.page;
+    if (!page) {
+      page = "1";
+    }
+    if (+page > pagesQuantity) {
+      res.status(404).send({
+        content: [],
+      });
+    } else {
+      const dbResponse = await this.products.getContentPerPage(+page);
+      res.status(200).send({
+        pages: pagesQuantity,
+        content: dbResponse.content,
+        logs: [
+          {
+            sql: rowsResponse.logs.sql,
+            date: rowsResponse.logs.date,
+            requestTime: rowsResponse.logs.requestTime,
+          },
+          {
+            sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+            date: dbResponse.logs.date,
+            requestTime: dbResponse.logs.requestTime,
+          },
+        ],
+      });
+    }
   };
 
   public getProductsByProductID: RequestHandler = async (req, res) => {

@@ -18,27 +18,47 @@ class EmployeesController extends Controller {
     this.router.get("/:employeeID", this.getEmployeesByID);
   };
   public getEmployees: RequestHandler = async (req, res) => {
-    const data = await this.employees.getContent();
-    const mappedContent = data.content.map((item) => {
-      const employeeFullName = `${item.firstName} ${item.lastName}`;
-      return {
-        id: item.id,
-        name: employeeFullName,
-        title: item.title,
-        city: item.city,
-        phone: item.phone,
-        country: item.country,
-      };
-    });
+    const rowsResponse = await this.employees.getRowsQuantity();
+    const pagesQuantity = Math.floor((rowsResponse.rows as number) / 20 + 1);
+    let page = req.query.page;
+    if (!page) {
+      page = "1";
+    }
+    if (+page > pagesQuantity) {
+      res.status(404).send({
+        content: [],
+      });
+    } else {
+      const data = await this.employees.getContentPerPage(+page);
+      const mappedContent = data.content.map((item) => {
+        const employeeFullName = `${item.firstName} ${item.lastName}`;
+        return {
+          id: item.id,
+          name: employeeFullName,
+          title: item.title,
+          city: item.city,
+          phone: item.phone,
+          country: item.country,
+        };
+      });
 
-    res.status(200).send({
-      content: mappedContent,
-      logs: {
-        sql: sqlSyntaxUpperCase(data.logs.sql),
-        date: data.logs.date,
-        requestTime: data.logs.requestTime,
-      },
-    });
+      res.status(200).send({
+        pages: pagesQuantity,
+        content: mappedContent,
+        logs: [
+          {
+            sql: rowsResponse.logs.sql,
+            date: rowsResponse.logs.date,
+            requestTime: rowsResponse.logs.requestTime,
+          },
+          {
+            sql: sqlSyntaxUpperCase(data.logs.sql),
+            date: data.logs.date,
+            requestTime: data.logs.requestTime,
+          },
+        ],
+      });
+    }
   };
   public getEmployeesByID: RequestHandler = async (req, res) => {
     const employeeID = req.params.employeeID;

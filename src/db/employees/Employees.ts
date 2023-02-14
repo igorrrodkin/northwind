@@ -1,21 +1,26 @@
 import { eq } from "drizzle-orm/expressions.js";
 import { employees } from "./schema.js";
 import { NodePgDatabase } from "drizzle-orm-pg/node/index.js";
+import { sql } from "drizzle-orm";
 
 class Employees {
   public constructor(public db: NodePgDatabase) {}
 
-  public getContent = async () => {
+  public getContentPerPage = async (page: number) => {
     const date1 = Date.now();
-    const content = await this.db.select(employees).fields({
-      id: employees.employeeID,
-      firstName: employees.firstName,
-      lastName: employees.lastName,
-      title: employees.title,
-      city: employees.city,
-      phone: employees.homePhone,
-      country: employees.country,
-    });
+    const content = await this.db
+      .select(employees)
+      .fields({
+        id: employees.employeeID,
+        firstName: employees.firstName,
+        lastName: employees.lastName,
+        title: employees.title,
+        city: employees.city,
+        phone: employees.homePhone,
+        country: employees.country,
+      })
+      .limit(20)
+      .offset((page - 1) * 20);
     const date2 = Date.now();
 
     const logs = this.db
@@ -28,6 +33,8 @@ class Employees {
         phone: employees.homePhone,
         country: employees.country,
       })
+      .limit(20)
+      .offset((page - 1) * 20)
       .toSQL();
     return {
       content,
@@ -101,6 +108,22 @@ class Employees {
       })
       .where(eq(employees.employeeID, employeeID));
     return names[0];
+  };
+
+  public getRowsQuantity = async () => {
+    const date1 = Date.now();
+    const response = await this.db.execute(
+      sql`SELECT count(1) AS total FROM northwind.employees`
+    );
+    const date2 = Date.now();
+    return {
+      rows: response.rows[0].total,
+      logs: {
+        sql: `SELECT count(1) AS total FROM northwind.employees`,
+        requestTime: date2 - date1 + "ms",
+        date: new Date(),
+      },
+    };
   };
 }
 

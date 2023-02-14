@@ -19,57 +19,72 @@ class OrdersController extends Controller {
   };
 
   public getOrdersPerPage: RequestHandler = async (req, res) => {
+    const rowsResponse = await this.orders.getRowsQuantity();
+    const pagesQuantity = Math.floor((rowsResponse.rows as number) / 20 + 1);
     let page = req.query.page;
     if (!page) {
       page = "1";
     }
-    const dbResponse = await this.orders.getFullContentPerPage(+page!);
-    const orderIDs = dbResponse.content.map((item) => item.orderID);
-    const orderIDsUnique = Array.from(new Set(orderIDs));
-    const mappedContent = orderIDsUnique.map((id) => {
-      const filteredByID = dbResponse.content.filter(
-        (element) => element.orderID == id
-      );
-      const products = filteredByID.length;
-      const quantity = filteredByID.reduce((acc, obj) => {
-        return acc + parseInt(obj.quantity!);
-      }, 0);
-      const price = filteredByID.reduce((acc, obj) => {
-        return acc + parseInt(obj.quantity!) * parseFloat(obj.unitPrice!);
-      }, 0);
-      const dataByID = dbResponse.content.find((item) => item.orderID == id);
+    if (+page > pagesQuantity) {
+      res.status(404).send({
+        content: [],
+      });
+    } else {
+      const dbResponse = await this.orders.getFullContentPerPage(+page!);
+      const orderIDs = dbResponse.content.map((item) => item.orderID);
+      const orderIDsUnique = Array.from(new Set(orderIDs));
+      const mappedContent = orderIDsUnique.map((id) => {
+        const filteredByID = dbResponse.content.filter(
+          (element) => element.orderID == id
+        );
+        const products = filteredByID.length;
+        const quantity = filteredByID.reduce((acc, obj) => {
+          return acc + parseInt(obj.quantity!);
+        }, 0);
+        const price = filteredByID.reduce((acc, obj) => {
+          return acc + parseInt(obj.quantity!) * parseFloat(obj.unitPrice!);
+        }, 0);
+        const dataByID = dbResponse.content.find((item) => item.orderID == id);
 
-      const validShippedDate = validDateByConvertingToDate(
-        dataByID!.shipped!,
-        16
-      );
-      return {
-        id: id,
-        price: price.toFixed(2),
-        products: products,
-        quantity: quantity,
-        shipped: validShippedDate,
-        shipName: dataByID?.shipName,
-        city: dataByID?.city,
-        country: dataByID?.country,
-      };
-    });
-    res.status(200).send({
-      pages: dbResponse.pages,
-      content: mappedContent,
-      logs: {
-        sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
-        date: dbResponse.logs.date,
-        requestTime: dbResponse.logs.requestTime,
-      },
-    });
+        const validShippedDate = validDateByConvertingToDate(
+          dataByID!.shipped!,
+          16
+        );
+        return {
+          id: id,
+          price: price.toFixed(2),
+          products: products,
+          quantity: quantity,
+          shipped: validShippedDate,
+          shipName: dataByID?.shipName,
+          city: dataByID?.city,
+          country: dataByID?.country,
+        };
+      });
+      res.status(200).send({
+        pages: pagesQuantity,
+        content: mappedContent,
+        logs: [
+          {
+            sql: rowsResponse.logs.sql,
+            date: rowsResponse.logs.date,
+            requestTime: rowsResponse.logs.requestTime,
+          },
+          {
+            sql: sqlSyntaxUpperCase(dbResponse.logs.sql),
+            date: dbResponse.logs.date,
+            requestTime: dbResponse.logs.requestTime,
+          },
+        ],
+      });
+    }
   };
 
   public getOrdersByOrderID: RequestHandler = async (req, res) => {
     const orderID = req.params.orderID;
     const dbResponse = await this.orders.getFullContentByOrderID(orderID);
     if (!dbResponse.content.length) {
-      res.status(200).send({
+      res.status(404).send({
         content: [],
       });
     } else {
