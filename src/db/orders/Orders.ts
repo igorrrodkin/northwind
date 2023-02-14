@@ -75,8 +75,12 @@ class Orders {
         ...orderDetails,
       })
       .leftJoin(orderDetails, eq(orders.orderID, orderDetails.orderID))
-      .limit(20)
-      .offset(page * 20 + 1)
+      .where(
+        and(
+          lte(orders.orderID, lastPaginationItem),
+          gte(orders.orderID, firstPaginationItem)
+        )
+      )
       .toSQL();
     return {
       pages,
