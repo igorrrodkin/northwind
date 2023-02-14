@@ -50,12 +50,18 @@ class EmployeesController extends Controller {
     } else {
       const employeeFullName = `${data.content.firstName} ${data.content.lastName}`;
       const reportsTo = data.content.reportsTo;
-      const reportsContent = await this.employees.getFullNameByEmployeeID(
-        reportsTo!
-      );
-      const fullNameReport = `${reportsContent.firstName} ${reportsContent.lastName}`;
-      const trueBirthDate = addYearsToDate(data.content.birthDate!, 32);
-      const trueHireDate = addYearsToDate(data.content.hireDate!, 32);
+      let fullNameReport: string | null;
+      if (reportsTo) {
+        const reportsContent = await this.employees.getFullNameByEmployeeID(
+          reportsTo
+        );
+        fullNameReport = `${reportsContent.firstName} ${reportsContent.lastName}`;
+      } else {
+        fullNameReport = null;
+      }
+
+      const trueBirthDate = addYearsToDate(data.content.birthDate, 32);
+      const trueHireDate = addYearsToDate(data.content.hireDate, 32);
       data.content.birthDate = trueBirthDate;
       data.content.hireDate = trueHireDate;
 
