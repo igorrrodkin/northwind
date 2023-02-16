@@ -3,6 +3,7 @@ import Orders from "../db/orders/Orders.js";
 import { validDateByConvertingToDate } from "../utils/dateHandler.js";
 import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 class OrdersController extends Controller {
   public readonly path: string;
@@ -14,8 +15,8 @@ class OrdersController extends Controller {
   }
 
   public initializeRoutes = () => {
-    this.router.get("/", this.getOrdersPerPage);
-    this.router.get("/:orderID", this.getOrdersByOrderID);
+    this.router.get("/", catchAsync(this.getOrdersPerPage));
+    this.router.get("/:orderID", catchAsync(this.getOrdersByOrderID));
   };
 
   public getOrdersPerPage: RequestHandler = async (req, res) => {

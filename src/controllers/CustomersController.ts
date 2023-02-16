@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import Customers from "../db/customers/Customers.js";
 import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
-
+import { catchAsync } from "../utils/catchAsync.js";
 class CustomersController extends Controller {
   public readonly path: string;
 
@@ -13,8 +13,8 @@ class CustomersController extends Controller {
   }
 
   public initializeRoutes = () => {
-    this.router.get("/", this.getCustomers);
-    this.router.get("/:customerID", this.getCustomerByID);
+    this.router.get("/", catchAsync(this.getCustomers));
+    this.router.get("/:customerID", catchAsync(this.getCustomerByID));
   };
   public getCustomers: RequestHandler = async (req, res) => {
     const rowsResponse = await this.customers.getRowsQuantity();

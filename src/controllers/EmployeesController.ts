@@ -3,6 +3,7 @@ import Employees from "../db/employees/Employees.js";
 import { addYearsToDate } from "../utils/dateHandler.js";
 import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 class EmployeesController extends Controller {
   public readonly path: string;
@@ -14,8 +15,8 @@ class EmployeesController extends Controller {
   }
 
   public initializeRoutes = () => {
-    this.router.get("/", this.getEmployees);
-    this.router.get("/:employeeID", this.getEmployeesByID);
+    this.router.get("/", catchAsync(this.getEmployees));
+    this.router.get("/:employeeID", catchAsync(this.getEmployeesByID));
   };
   public getEmployees: RequestHandler = async (req, res) => {
     const rowsResponse = await this.employees.getRowsQuantity();

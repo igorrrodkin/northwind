@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import Supplies from "../db/supplies/Supplies.js";
 import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 class SuppliesController extends Controller {
   public readonly path: string;
@@ -13,8 +14,8 @@ class SuppliesController extends Controller {
   }
 
   public initializeRoutes = () => {
-    this.router.get("/", this.getSupplies);
-    this.router.get("/:supplierID", this.getSuppliesBySupplierID);
+    this.router.get("/", catchAsync(this.getSupplies));
+    this.router.get("/:supplierID", catchAsync(this.getSuppliesBySupplierID));
   };
   public getSupplies: RequestHandler = async (req, res) => {
     const rowsResponse = await this.supplies.getRowsQuantity();

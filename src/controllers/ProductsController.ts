@@ -3,6 +3,7 @@ import Products from "../db/products/Products.js";
 import Supplies from "../db/supplies/Supplies.js";
 import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 class ProductsController extends Controller {
   public readonly path: string;
@@ -18,8 +19,8 @@ class ProductsController extends Controller {
   }
 
   public initializeRoutes = () => {
-    this.router.get("/", this.getProducts);
-    this.router.get("/:productID", this.getProductsByProductID);
+    this.router.get("/", catchAsync(this.getProducts));
+    this.router.get("/:productID", catchAsync(this.getProductsByProductID));
   };
   public getProducts: RequestHandler = async (req, res) => {
     const rowsResponse = await this.products.getRowsQuantity();

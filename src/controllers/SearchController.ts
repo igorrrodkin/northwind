@@ -3,6 +3,7 @@ import Customers from "../db/customers/Customers.js";
 import Products from "../db/products/Products.js";
 import { sqlSyntaxUpperCase } from "../utils/logsFormatter.js";
 import Controller from "./Controller.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 class SearchController extends Controller {
   public readonly path: string;
@@ -18,7 +19,7 @@ class SearchController extends Controller {
   }
 
   public initializeRoutes = () => {
-    this.router.post("/:searchInput", this.searchCustomersProducts);
+    this.router.post("/:searchInput", catchAsync(this.searchCustomersProducts));
   };
 
   public searchCustomersProducts: RequestHandler = async (req, res) => {
